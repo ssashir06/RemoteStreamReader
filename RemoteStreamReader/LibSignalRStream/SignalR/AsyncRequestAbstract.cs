@@ -11,22 +11,35 @@ namespace SignalRStream.SignalR
 {
     class AsyncRequestAbstract<TResponse>
     {
-        #region Exceptions
+        #region class
 
         public class TooManyRequests : Exception
         {
             public TooManyRequests() : base() { }
             public TooManyRequests(string message) : base(message) { }
         }
-        
+
+
+        class ValueContainerSemaphore<TValue> : SemaphoreSlim
+        {
+            public ValueContainerSemaphore()
+                : base(0, 1)
+            {
+                Guid = Guid.NewGuid();
+            }
+
+            public TValue Value { get; set; }
+            public Guid Guid { get; protected set; }
+        }
+
         #endregion
 
-        readonly int? _max;
+        readonly int? _maxRequestPerConnection;
         readonly IDictionary<string, IList<ValueContainerSemaphore<TResponse>>> _responses = new Dictionary<string, IList<ValueContainerSemaphore<TResponse>>>();
 
-        public AsyncRequestAbstract(int? max = null)
+        public AsyncRequestAbstract(int? numberOfMaxRequestsPerConnection = null)
         {
-            _max = max;
+            _maxRequestPerConnection = numberOfMaxRequestsPerConnection;
         }
 
         public async Task<TResponse> GetRequestResult(string connectionId, Action<Guid, dynamic> signalrCaller)
@@ -46,9 +59,9 @@ namespace SignalRStream.SignalR
 
             lock (containers)
             {
-                if (_max.HasValue && containers.Count - 1 >= _max)
+                if (_maxRequestPerConnection.HasValue && containers.Count - 1 >= _maxRequestPerConnection)
                 {
-                    throw new TooManyRequests("Too much requests");
+                    throw new TooManyRequests("Too many requests");
                 }
             }
 
