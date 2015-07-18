@@ -1,0 +1,73 @@
+﻿@using System.Web.Optimization
+@{
+    Layout = null;
+
+    string identifier = ViewBag.Identifier;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>ReadFile</title>
+    @Scripts.Render("~/bundles/jquery")
+</head>
+<body>
+    <div>
+        Receive: <div id="signalr-receive-date"></div>
+    </div>
+    <form>
+        <div>
+            GUID: <input type="text" id="input-guid" />
+        </div>
+        <div>
+            Range: <input type="number" id="input-range-begin" />
+            -
+            <input type="number" id="input-range-end" />
+        </div>
+        <div>
+            <input type="text" id="input-response-text" />
+        </div>
+        <div>
+            <input type="button" id="input-response-send" value="response" />
+        </div>
+    </form>
+    <script src="/signalr/hubs"></script>
+    <script>
+        (function ($, identifier) {
+            var hub = $.connection.WebFileStream;
+
+            hub.client.RequestRange = function(guid, begin, end) {
+                $('#signalr-receive-date').val(new Date());
+                $('#input-guid').val(guid);
+                $('#input-range-begin').val(begin);
+                $('#input-range-end').val(end);
+                $('#input-response-text').val('');
+            };
+
+            $.connection.hub.start().done(function () {
+                hub.invoke('Hello', identifier);
+            });
+
+            $('#input-response-send').on('click', function (ev) {
+                ev.preventDefault();
+
+                var guid = $('#input-guid').val();
+                var rangeBegin = $('#input-range-begin').val();
+                var rangeEnd = $('#input-range-end').val();
+                var responseText = $('#input-response-text').val();
+
+                hub.invoke('Response', guid, responseText).always(function (ev) {
+                    $('#signalr-receive-date').val('');
+                    $('#input-guid').val('');
+                    $('#input-range-begin').val('');
+                    $('#input-range-end').val('');
+                    $('#input-response-text').val('');
+                });
+            });
+
+        })(jQuery, '@identifier');
+    </script>
+</body>
+</html>

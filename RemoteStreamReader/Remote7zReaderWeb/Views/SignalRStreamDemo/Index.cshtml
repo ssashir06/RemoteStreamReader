@@ -1,0 +1,31 @@
+﻿@using System.Web.Optimization
+@{
+    Layout = null;
+    string identifier = ViewBag.Identifier;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    @Scripts.Render("~/bundles/jquery")
+</head>
+<body>
+    <form>
+        <div>
+            <input type="text" id="start-identifier" value="@identifier" />
+        </div>
+        <input type="button" id="start-button" value="start" />
+    </form>
+    <script>
+        (function ($, window) {
+            $('#start-button').on('click', function (ev) {
+                var id = $('#start-identifier').val();
+                window.location = '/SignalRStreamDemo/ReadFile?id=' + id;
+            });
+        })(jQuery, window);
+    </script>
+</body>
+</html>
