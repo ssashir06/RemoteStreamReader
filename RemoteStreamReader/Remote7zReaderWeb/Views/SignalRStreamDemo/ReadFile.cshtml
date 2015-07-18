@@ -39,7 +39,7 @@
             var hub = $.connection.WebFileStream;
 
             hub.client.RequestRange = function(guid, begin, end) {
-                $('#signalr-receive-date').val(new Date());
+                $('#signalr-receive-date').html(new Date());
                 $('#input-guid').val(guid);
                 $('#input-range-begin').val(begin);
                 $('#input-range-end').val(end);
@@ -58,7 +58,7 @@
                 var rangeEnd = $('#input-range-end').val();
                 var responseText = $('#input-response-text').val();
 
-                hub.invoke('Response', guid, responseText).always(function (ev) {
+                hub.invoke('Response', guid, rangeBegin, rangeEnd, responseText).always(function (ev) {
                     $('#signalr-receive-date').val('');
                     $('#input-guid').val('');
                     $('#input-range-begin').val('');

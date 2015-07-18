@@ -25,12 +25,12 @@ namespace Remote7zReaderWeb.Controllers
 
             Task.Factory.StartNew(async () =>
             {
-                var hub = WebFileHubManagerSingleton.Instance as IWebFileHubManager;
+                var hubManager = WebFileHubManagerSingleton.Instance;
 
-                var connectionid = await hub.GetConnectionIdBy(id);
+                var connectionid = await hubManager.GetConnectionIdBy(id);
                 Trace.WriteLine(string.Format("Connected. ConnectionId={0}", connectionid));
 
-                var response = await hub.Request(connectionid, 0, 100);
+                var response = await hubManager.Request(connectionid, 0, 100);
                 Trace.WriteLine(string.Format("Response is {0}{1}", Environment.NewLine, response));
             });
 

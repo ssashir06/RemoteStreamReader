@@ -10,19 +10,19 @@ using Microsoft.AspNet.SignalR;
 
 namespace SignalRStream.Services
 {
-    public class WebFileHubManagerSingleton : IWebFileHubManager
+    public class WebFileHubManagerSingleton
     {
-        class ResponseContainer : SemaphoreSlim
-        {
-            public ResponseContainer()
-                : base(0, 1)
-            {
-                Guid = Guid.NewGuid();
-            }
+        WebFileHubManagerSingleton() { }
 
-            public Guid Guid { get; protected set; }
-            public string Response { get; set; }
-        }
+        #region Singleton Instance
+        
+        static Lazy<WebFileHubManagerSingleton> _instance = new Lazy<WebFileHubManagerSingleton>(() => new WebFileHubManagerSingleton());
+
+        public static WebFileHubManagerSingleton Instance { get { return _instance.Value; } }
+
+        #endregion
+
+        #region Hello
 
         class HelloSemapher : SemaphoreSlim
         {
@@ -30,49 +30,7 @@ namespace SignalRStream.Services
             public string ConnectionId { get; set; }
         }
 
-        static Lazy<WebFileHubManagerSingleton> _instance = new Lazy<WebFileHubManagerSingleton>(() => new WebFileHubManagerSingleton());
-        static IDictionary<string, IList<ResponseContainer>> _responses = new Dictionary<string, IList<ResponseContainer>>();
         static IDictionary<string, HelloSemapher> _helloWaits = new Dictionary<string, HelloSemapher>();
-
-        WebFileHubManagerSingleton() { }
-
-        public static WebFileHubManagerSingleton Instance { get { return _instance.Value; } }
-
-        #region SignalR Methods
-
-        public void Response(string connectionId, string guid, string response)
-        {
-            Trace.TraceInformation(string.Format("Response {0}: {1}", connectionId, response));
-
-            IList<ResponseContainer> containers = null;
-            lock (_responses)
-            {
-                if (!_responses.ContainsKey(connectionId))
-                {
-                    throw new Exception("Unexpected Connection Id");
-                }
-
-                containers = _responses[connectionId];
-            }
-
-            ResponseContainer container = null;
-            lock (containers)
-            {
-                container = (
-                    from c in containers 
-                    where c.Guid.ToString() == guid 
-                    select c
-                    ).FirstOrDefault();
-            }
-
-            if (container == null)
-            {
-                throw new ArgumentException("Unexpected GUID");
-            }
-
-            container.Response = response;
-            container.Release();
-        }
 
         public void Hello(string connectionId, string identifier)
         {
@@ -83,56 +41,17 @@ namespace SignalRStream.Services
                     throw new ArgumentException("The identifier is not expected");
                 }
 
-                var semapher = _helloWaits[identifier];
+                HelloSemapher semapher;
+                lock (_helloWaits)
+                {
+                    semapher = _helloWaits[identifier];
+                }
                 semapher.ConnectionId = connectionId;
                 semapher.Release();
             }
         }
-        
-        #endregion
 
-        #region IWebFileHub メンバー
-
-        async Task<string> IWebFileHubManager.Request(string connectionId, int begin, int end)
-        {
-            IList<ResponseContainer> containers = null;
-            lock (_responses)
-            {
-                if (!_responses.ContainsKey(connectionId))
-                {
-                    _responses.Add(connectionId, containers = new List<ResponseContainer>());
-                }
-                else
-                {
-                    containers = _responses[connectionId];
-                }
-            }
-
-            string response;
-            using (var container = new ResponseContainer())
-            {
-                var context = GlobalHost.ConnectionManager.GetHubContext<WebFileHub>();
-                lock (containers)
-                {
-                    containers.Add(container);
-                }
-                context.Clients.Client(connectionId).RequestRange(container.Guid.ToString(), begin, end);
-
-                await container.WaitAsync();
-                response = container.Response;
-                // TODO: タイムアウトの取り扱い
-
-                lock (containers)
-                {
-                    containers.Remove(container);
-                }
-            }
-
-            return response;
-        }
-
-
-        async Task<string> IWebFileHubManager.GetConnectionIdBy(string identifier)
+        public async Task<string> GetConnectionIdBy(string identifier)
         {
             using (var semapher = new HelloSemapher())
             {
@@ -151,6 +70,24 @@ namespace SignalRStream.Services
                 }
                 return semapher.ConnectionId;
             }
+        }
+
+        #endregion
+
+        #region FileBody
+
+        static AsyncRequestAbstract<string> _filebodyRequests = new AsyncRequestAbstract<string>();
+
+        public void Response(string connectionId, string guid, string response)
+        {
+            _filebodyRequests.SetSignalRValue(connectionId, guid, response);
+        }
+        
+        public async Task<string> Request(string connectionId, int begin, int end)
+        {
+            return await _filebodyRequests.GetRequestResult(connectionId, (guid, client) =>
+                client.RequestRange(guid.ToString(), begin, end)
+            );
         }
 
         #endregion
