@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 
-namespace SignalRStream.Services
+namespace SignalRStream.SignalR
 {
     class AsyncRequestAbstract<TResponse>
     {

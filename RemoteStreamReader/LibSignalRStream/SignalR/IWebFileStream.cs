@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace SignalRStream.Services
+namespace SignalRStream.SignalR
 {
     public interface IWebFileStream : IDisposable
     {

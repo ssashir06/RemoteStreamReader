@@ -60,12 +60,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\AsyncRequestAbstract.cs" />
-    <Compile Include="Services\IWebFileHub.cs" />
-    <Compile Include="Services\IWebFileStream.cs" />
-    <Compile Include="Services\ValueContainerSemaphore.cs" />
-    <Compile Include="Services\WebFileHub.cs" />
-    <Compile Include="Services\WebFileManagerSingleton.cs" />
+    <Compile Include="SignalR\AsyncRequestAbstract.cs" />
+    <Compile Include="SignalR\IWebFileHub.cs" />
+    <Compile Include="SignalR\IWebFileStream.cs" />
+    <Compile Include="SignalR\ValueContainerSemaphore.cs" />
+    <Compile Include="SignalR\WebFileHub.cs" />
+    <Compile Include="SignalR\WebFileManagerSingleton.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

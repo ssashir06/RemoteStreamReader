@@ -6,7 +6,7 @@ using System.Web.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
-using SignalRStream.Services;
+using SignalRStream.SignalR;
 
 namespace Remote7zReaderWeb.Controllers
 {

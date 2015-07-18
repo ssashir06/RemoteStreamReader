@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SignalRStream.Services
+namespace SignalRStream.SignalR
 {
     class ValueContainerSemaphore<TValue>
         : SemaphoreSlim

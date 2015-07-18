@@ -1,5 +1,5 @@
 ﻿using System;
-namespace SignalRStream.Services
+namespace SignalRStream.SignalR
 {
     public interface IWebFileHub
     {

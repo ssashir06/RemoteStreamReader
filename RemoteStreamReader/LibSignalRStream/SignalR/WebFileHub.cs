@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 
-namespace SignalRStream.Services
+namespace SignalRStream.SignalR
 {
     [HubName("WebFileStream")]
     public class WebFileHub : Hub<IWebFileHub>, IWebFileHub

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR.Hubs;
 using Microsoft.AspNet.SignalR;
 
-namespace SignalRStream.Services
+namespace SignalRStream.SignalR
 {
     public class WebFileHubManagerSingleton
     {
