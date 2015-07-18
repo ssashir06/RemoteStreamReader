@@ -19,9 +19,9 @@ namespace SignalRStream.Services
             WebFileHubManagerSingleton.Instance.Hello(Context.ConnectionId, identifier);
         }
 
-        public void Response(string guid, int begin, int end, string response)
+        public void ResponseFileData(string guid, int begin, int end, string response)
         {
-            WebFileHubManagerSingleton.Instance.Response(Context.ConnectionId, guid, response);
+            WebFileHubManagerSingleton.Instance.SetSignalrValueFileData(Context.ConnectionId, guid, response);
         }
 
         #endregion

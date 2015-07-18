@@ -78,15 +78,15 @@ namespace SignalRStream.Services
 
         static AsyncRequestAbstract<string> _filebodyRequests = new AsyncRequestAbstract<string>();
 
-        public void Response(string connectionId, string guid, string response)
+        public void SetSignalrValueFileData(string connectionId, string guid, string response)
         {
             _filebodyRequests.SetSignalRValue(connectionId, guid, response);
         }
         
-        public async Task<string> Request(string connectionId, int begin, int end)
+        public async Task<string> GetFileData(string connectionId, int begin, int end)
         {
             return await _filebodyRequests.GetRequestResult(connectionId, (guid, client) =>
-                client.RequestRange(guid.ToString(), begin, end)
+                client.GetFileData(guid.ToString(), begin, end)
             );
         }
 
