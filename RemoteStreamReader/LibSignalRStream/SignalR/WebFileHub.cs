@@ -19,11 +19,38 @@ namespace SignalRStream.SignalR
             WebFileHubManagerSingleton.Instance.Hello(Context.ConnectionId, identifier);
         }
 
-        public void ResponseFileData(string guid, int begin, int end, string response)
+        public void FileOpened()
+        {
+            WebFileHubManagerSingleton.Instance.SetClientState(Context.ConnectionId, ClientState.Opened);
+        }
+
+        public void FileClosed()
+        {
+            WebFileHubManagerSingleton.Instance.SetClientState(Context.ConnectionId, ClientState.Connected);
+        }
+
+        public void Bye()
+        {
+            WebFileHubManagerSingleton.Instance.SetClientState(Context.ConnectionId, ClientState.Disconnected);
+        }
+
+        public void TellLength(string guid, long length)
+        {
+            WebFileHubManagerSingleton.Instance.SetSignalrValueFileSize(Context.ConnectionId, guid, length);
+        }
+
+        public void TellBuffer(string guid, long begin, long end, string response)
         {
             WebFileHubManagerSingleton.Instance.SetSignalrValueFileData(Context.ConnectionId, guid, response);
         }
 
         #endregion
+
+        public override System.Threading.Tasks.Task OnDisconnected(bool stopCalled)
+        {
+            WebFileHubManagerSingleton.Instance.SetClientState(Context.ConnectionId, ClientState.Disconnected);
+            return base.OnDisconnected(stopCalled);
+        }
+
     }
 }

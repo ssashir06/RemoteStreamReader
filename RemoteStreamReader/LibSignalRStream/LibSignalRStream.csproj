@@ -61,10 +61,11 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SignalR\AsyncRequestAbstract.cs" />
+    <Compile Include="SignalR\ClientState.cs" />
     <Compile Include="SignalR\IWebFileHub.cs" />
-    <Compile Include="Stream\IWebFileStream.cs" />
     <Compile Include="SignalR\WebFileHub.cs" />
     <Compile Include="SignalR\WebFileManagerSingleton.cs" />
+    <Compile Include="Streams\RemoteWebStream.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

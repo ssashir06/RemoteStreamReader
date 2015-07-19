@@ -22,6 +22,60 @@ namespace SignalRStream.SignalR
 
         #endregion
 
+        #region Ready?
+
+        readonly IDictionary<string, ClientState> _clientStates = new Dictionary<string, ClientState>();
+
+        public bool IsConnected(string connectionId)
+        {
+            lock (_clientStates)
+            {
+                if (!_clientStates.ContainsKey(connectionId))
+                {
+                    return false;
+                }
+
+                return _clientStates[connectionId].HasFlag(ClientState.Connected);
+            }
+        }
+
+        public bool IsOpened(string connectionId)
+        {
+            lock (_clientStates)
+            {
+                if (!_clientStates.ContainsKey(connectionId))
+                {
+                    return false;
+                }
+
+                return _clientStates[connectionId].HasFlag(ClientState.Opened);
+            }
+        }
+
+        public void SetClientState(string connectionId, ClientState state)
+        {
+            lock (_clientStates)
+            {
+                switch (state)
+                {
+                    case ClientState.Disconnected:
+                        if (_clientStates.ContainsKey(connectionId))
+                        {
+                            _clientStates.Remove(connectionId);
+                        }
+                        return;
+                    case ClientState.Opened:
+                    case ClientState.Connected:
+                        _clientStates[connectionId] = state;
+                        return;
+                    default:
+                        throw new ArgumentException("Bad state");
+                }
+            }
+        }
+
+        #endregion
+
         #region Hello
 
         class HelloSemapher : SemaphoreSlim
@@ -48,6 +102,8 @@ namespace SignalRStream.SignalR
                 }
                 semapher.ConnectionId = connectionId;
                 semapher.Release();
+
+                SetClientState(connectionId, ClientState.Connected);
             }
         }
 
@@ -74,18 +130,36 @@ namespace SignalRStream.SignalR
 
         #endregion
 
+        #region get Length
+
+        static AsyncRequestAbstract<long> _fileSizeRequests = new AsyncRequestAbstract<long>();
+
+        public void SetSignalrValueFileSize(string connectionId, string guid, long length)
+        {
+            _fileSizeRequests.SetSignalRValue(connectionId, guid, length);
+        }
+
+        public async Task<long> GetFileSize(string connectionId)
+        {
+            return await _fileSizeRequests.GetRequestResult(connectionId, (guid, client) =>
+                client.GetFileSize(guid.ToString())
+            );
+        }
+        
+        #endregion
+
         #region FileBody
 
-        static AsyncRequestAbstract<string> _filebodyRequests = new AsyncRequestAbstract<string>();
+        static AsyncRequestAbstract<string> _fileBodyRequests = new AsyncRequestAbstract<string>();
 
         public void SetSignalrValueFileData(string connectionId, string guid, string response)
         {
-            _filebodyRequests.SetSignalRValue(connectionId, guid, response);
+            _fileBodyRequests.SetSignalRValue(connectionId, guid, response);
         }
         
-        public async Task<string> GetFileData(string connectionId, int begin, int end)
+        public async Task<string> GetFileData(string connectionId, long begin, long end)
         {
-            return await _filebodyRequests.GetRequestResult(connectionId, (guid, client) =>
+            return await _fileBodyRequests.GetRequestResult(connectionId, (guid, client) =>
                 client.GetFileData(guid.ToString(), begin, end)
             );
         }
