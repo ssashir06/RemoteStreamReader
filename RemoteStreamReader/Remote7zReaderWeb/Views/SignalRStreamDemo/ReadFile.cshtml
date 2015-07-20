@@ -46,6 +46,10 @@
                 $('#input-response-text').val('');
             };
 
+            hub.client.GetFileSize = function (guid) {
+                hub.invoke('TellFileSize', guid, 99999);
+            };
+
             $.connection.hub.start().done(function () {
                 hub.invoke('Hello', identifier);
             });
@@ -58,7 +62,7 @@
                 var rangeEnd = $('#input-range-end').val();
                 var responseText = $('#input-response-text').val();
 
-                hub.invoke('ResponseFileData', guid, rangeBegin, rangeEnd, responseText).always(function (ev) {
+                hub.invoke('TellFileData', guid, rangeBegin, rangeEnd, responseText).always(function (ev) {
                     $('#signalr-receive-date').val('');
                     $('#input-guid').val('');
                     $('#input-range-begin').val('');

@@ -50,11 +50,10 @@ namespace SignalRStream.Streams
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            string receiveBase64Encoded = WebFileHubManagerSingleton.Instance.GetFileData(ConnectionId, Position, Position + count).Result;
-            var receiveDecoded = Convert.FromBase64String(receiveBase64Encoded);
-            int copySize = Math.Min(count, receiveDecoded.Count());
-            Buffer.BlockCopy(receiveDecoded, 0, buffer, offset, copySize);
-            Trace.WriteLineIf(count > receiveDecoded.Count(), "Received size is too large.");
+            var receivedData = WebFileHubManagerSingleton.Instance.GetFileData(ConnectionId, Position, Position + count).Result;
+            int copySize = Math.Min(count, receivedData.DataDecoded.Count());
+            Buffer.BlockCopy(receivedData.DataDecoded, 0, buffer, offset, copySize);
+            Trace.WriteLineIf(count > receivedData.DataDecoded.Count(), "Received size is too large.");
             return copySize;
         }
 

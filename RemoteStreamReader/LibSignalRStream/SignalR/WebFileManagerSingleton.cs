@@ -136,6 +136,7 @@ namespace SignalRStream.SignalR
 
         public void SetSignalrValueFileSize(string connectionId, string guid, long length)
         {
+            Trace.WriteLine(string.Format("FileSize of {0}({1}): {2}", connectionId, guid, length));
             _fileSizeRequests.SetSignalRValue(connectionId, guid, length);
         }
 
@@ -150,14 +151,15 @@ namespace SignalRStream.SignalR
 
         #region FileBody
 
-        static AsyncRequestAbstract<string> _fileBodyRequests = new AsyncRequestAbstract<string>();
+        static AsyncRequestAbstract<ResponseFileData> _fileBodyRequests = new AsyncRequestAbstract<ResponseFileData>();
 
-        public void SetSignalrValueFileData(string connectionId, string guid, string response)
+        public void SetSignalrValueFileData(string connectionId, string guid, long begin, long end, string responseBase64)
         {
-            _fileBodyRequests.SetSignalRValue(connectionId, guid, response);
+            Trace.WriteLine(string.Format("FileData of {0}({1}): length={2}", connectionId, guid, responseBase64.Length));
+            _fileBodyRequests.SetSignalRValue(connectionId, guid, new ResponseFileData(begin, end, responseBase64));
         }
         
-        public async Task<string> GetFileData(string connectionId, long begin, long end)
+        public async Task<ResponseFileData> GetFileData(string connectionId, long begin, long end)
         {
             return await _fileBodyRequests.GetRequestResult(connectionId, (guid, client) =>
                 WebFileHub.GetFileData(guid, client, begin, end)

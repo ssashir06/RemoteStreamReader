@@ -41,7 +41,7 @@ namespace SignalRStream.SignalR
 
         public void TellBuffer(string guid, long begin, long end, string response)
         {
-            WebFileHubManagerSingleton.Instance.SetSignalrValueFileData(Context.ConnectionId, guid, response);
+            WebFileHubManagerSingleton.Instance.SetSignalrValueFileData(Context.ConnectionId, guid, begin, end, response);
         }
 
         #endregion
