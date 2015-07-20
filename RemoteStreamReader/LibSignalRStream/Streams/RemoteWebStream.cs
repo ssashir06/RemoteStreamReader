@@ -9,7 +9,7 @@ using SignalRStream.SignalR;
 
 namespace SignalRStream.Streams
 {
-    public class RemoteWebStream : Stream
+    public class RemoteWebStream : Stream, IDisposable
     {
         public RemoteWebStream(string connectionId)
         {
@@ -53,7 +53,8 @@ namespace SignalRStream.Streams
             var receivedData = WebFileHubManagerSingleton.Instance.GetFileData(ConnectionId, Position, Position + count).Result;
             int copySize = Math.Min(count, receivedData.DataDecoded.Count());
             Buffer.BlockCopy(receivedData.DataDecoded, 0, buffer, offset, copySize);
-            Trace.WriteLineIf(count > receivedData.DataDecoded.Count(), "Received size is too large.");
+            Trace.WriteLineIf(count < receivedData.DataDecoded.Count(), "Received size is too large.");
+            Position += copySize;
             return copySize;
         }
 
@@ -103,6 +104,15 @@ namespace SignalRStream.Streams
 
         #endregion
         
+        #endregion
+
+        #region IDisposable メンバー
+
+        void IDisposable.Dispose()
+        {
+            WebFileHubManagerSingleton.Instance.CloseFile(ConnectionId);
+        }
+
         #endregion
     }
 }

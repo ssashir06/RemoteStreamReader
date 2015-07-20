@@ -1,0 +1,85 @@
+﻿@using System.Web.Optimization
+@{
+    Layout = null;
+    string identifier = ViewBag.Identifier;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/util")
+    <script src="/signalr/hubs"></script>
+</head>
+<body>
+    <form id="form-start">
+        <div>
+            (1)
+            <input type="text" id="input-identifier" value="@identifier" />
+            <input type="button" id="input-start-button" value="Start" />
+        </div>
+    </form>
+    <form id="form-filename">
+        <div>
+            (2)
+            <input type="file" id="input-filename" />
+            <input type="button" id="input-open-button" value="Open" />
+        </div>
+    </form>
+    <script>
+        (function ($, window) {
+            var hub = $.connection.WebFileStream;
+            var file = null;
+
+            $('#input-start-button').on('click', function (ev) {
+                ev.preventDefault();
+                var identifier = $('#input-identifier').val();
+
+                $.connection.hub.start().done(function () {
+                    hub.invoke('Hello', identifier);
+                })
+            });
+
+            $('#input-open-button').on('click', function (ev) {
+                ev.preventDefault();
+
+                file = $('#input-filename')[0].files[0];
+
+                hub.invoke('FileOpened');
+            });
+
+            hub.client.GetFileSize = function (guid) {
+                hub.invoke('TellFileSize', guid, file.size);
+            };
+
+            hub.client.GetFileData = function (guid, begin, end) {
+                var blob = file.slice(begin, end);
+                var fileReader = new FileReader();
+                fileReader.onloadend = function (ev) {
+                    if (ev.target.readyState == FileReader.DONE) {
+                        var result = ev.target.result;
+                        var encoded = base64ArrayBuffer(result);
+                        hub.invoke('TellBuffer', guid, begin, end, encoded);
+                    }
+                };
+                fileReader.readAsArrayBuffer(blob);
+            };
+
+            hub.client.CloseFile = function () {
+                file = null;
+
+                hub.invoke('FileClosed');
+            }
+
+            $(window).on('unload', function (ev) {
+                hub.invoke('Bye');
+            });
+
+
+        })(jQuery, window);
+    </script>
+</body>
+</html>

@@ -168,5 +168,15 @@ namespace SignalRStream.SignalR
 
         #endregion
 
+        #region Close
+
+        public void CloseFile(string connectionId)
+        {
+            var context = GlobalHost.ConnectionManager.GetHubContext<WebFileHub>();
+            var client = context.Clients.Client(connectionId);
+            WebFileHub.CloseFile(client);
+        }
+        
+        #endregion
     }
 }

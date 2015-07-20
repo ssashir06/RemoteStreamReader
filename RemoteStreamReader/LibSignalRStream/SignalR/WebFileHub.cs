@@ -57,6 +57,11 @@ namespace SignalRStream.SignalR
         {
             client.GetFileData(guid.ToString(), begin, end);
         }
+
+        public static void CloseFile(dynamic client)
+        {
+            client.CloseFile();
+        }
         
         #endregion
 

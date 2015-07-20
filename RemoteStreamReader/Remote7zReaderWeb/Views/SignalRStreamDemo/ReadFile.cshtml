@@ -62,7 +62,7 @@
                 var rangeEnd = $('#input-range-end').val();
                 var responseText = $('#input-response-text').val();
 
-                hub.invoke('TellFileData', guid, rangeBegin, rangeEnd, responseText).always(function (ev) {
+                hub.invoke('TellBuffer', guid, rangeBegin, rangeEnd, responseText).always(function (ev) {
                     $('#signalr-receive-date').val('');
                     $('#input-guid').val('');
                     $('#input-range-begin').val('');

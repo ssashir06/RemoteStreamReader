@@ -15,6 +15,9 @@ namespace Remote7zReaderWeb
                 "~/Scripts/jquery-ui-{version}.js",
                 "~/Scripts/jquery.signalR-{version}.js"
                 ));
+            bundles.Add(new ScriptBundle("~/bundles/util").Include(
+                "~/Scripts/base64arraybuffer.js"
+                ));
 
         }
 
