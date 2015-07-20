@@ -160,6 +160,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="7z64.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="7za.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="Global.asax" />
     <Content Include="Scripts\ai.0.15.0-build32981.js" />
     <Content Include="Scripts\ai.0.15.0-build32981.min.js" />
@@ -190,6 +196,7 @@
     <Content Include="Scripts\jquery-2.1.4.min.map" />
     <Content Include="Views\SignalRStreamDemo\Index.cshtml" />
     <Content Include="Views\FileReadDemo\Index.cshtml" />
+    <Content Include="Views\FileReadDemo\SevenZipFileList.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

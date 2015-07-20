@@ -50,7 +50,7 @@ namespace SignalRStream.Streams
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var receivedData = WebFileHubManagerSingleton.Instance.GetFileData(ConnectionId, Position, Position + count).Result;
+            var receivedData = WebFileHubManagerSingleton.Instance.GetFileData(ConnectionId, Position, Position + count - 1).Result;
             int copySize = Math.Min(count, receivedData.DataDecoded.Count());
             Buffer.BlockCopy(receivedData.DataDecoded, 0, buffer, offset, copySize);
             Trace.WriteLineIf(count < receivedData.DataDecoded.Count(), "Received size is too large.");
@@ -70,7 +70,8 @@ namespace SignalRStream.Streams
                     p = Position;
                     break;
                 case SeekOrigin.End:
-                    p = Length - 1;
+                    //p = Length - 1; Doesn't work
+                    p = Length;
                     break;
                 default:
                     throw new ArgumentException();

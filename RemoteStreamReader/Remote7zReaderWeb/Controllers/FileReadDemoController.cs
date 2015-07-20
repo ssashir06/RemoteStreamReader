@@ -16,6 +16,14 @@ namespace Remote7zReaderWeb.Controllers
 {
     public class FileReadDemoController : Controller
     {
+
+        void SendMessage(WebFileHubManagerSingleton hubManager, string connectionId, string message)
+        {
+            dynamic data = new ExpandoObject();
+            data.text = message;
+            hubManager.SendExtraData(connectionId, data);
+        }
+
         public ActionResult Index()
         {
             var identifier = Guid.NewGuid().ToString();
@@ -27,23 +35,15 @@ namespace Remote7zReaderWeb.Controllers
 
                 var connectionId = await hubManager.GetConnectionIdBy(identifier);
                 Trace.WriteLine(string.Format("Connected. ConnectionId={0}", connectionId));
+                SendMessage(hubManager, connectionId, "connected. wainting for opening file");
 
-                {
-                    dynamic data = new ExpandoObject();
-                    data.text = "connected.";
-                    hubManager.SendExtraData(connectionId, data);
-                }
 
                 while (!hubManager.IsOpened(connectionId))
                 {
                     Thread.Sleep(1000);
                 }
                 Trace.WriteLine(string.Format("File opened"));
-                {
-                    dynamic data = new ExpandoObject();
-                    data.text = "ok, opened.";
-                    hubManager.SendExtraData(connectionId, data);
-                }
+                SendMessage(hubManager, connectionId, "ok, ready to request file data.");
 
                 var sb = new StringBuilder();
                 sb.AppendLine("data read:");
@@ -61,13 +61,51 @@ namespace Remote7zReaderWeb.Controllers
                     sb.AppendFormat("file size: {1}{0}", Environment.NewLine, rws.Length);
                 }
                 sb.AppendLine("DONE");
+                SendMessage(hubManager, connectionId, sb.ToString());
 
+            });
+
+            return View();
+        }
+
+        public ActionResult SevenZipFileList()
+        {
+            var identifier = Guid.NewGuid().ToString();
+            ViewBag.Identifier = identifier;
+
+            Task.Factory.StartNew(async () =>
+            {
+                var hubManager = WebFileHubManagerSingleton.Instance;
+
+                var connectionId = await hubManager.GetConnectionIdBy(identifier);
+                Trace.WriteLine(string.Format("Connected. ConnectionId={0}", connectionId));
+                SendMessage(hubManager, connectionId, "connected. wainting for opening file");
+
+                while (!hubManager.IsOpened(connectionId))
                 {
-                    dynamic data = new ExpandoObject();
-                    data.text = sb.ToString();
-                    hubManager.SendExtraData(connectionId, data);
+                    Thread.Sleep(1000);
                 }
+                Trace.WriteLine(string.Format("File opened"));
+                SendMessage(hubManager, connectionId, "ok, ready to request file data.");
 
+                SevenZip.SevenZipCompressor.SetLibraryPath(@"C:\Users\hiroshi\Documents\GitHub\RemoteStreamReader\RemoteStreamReader\Remote7zReaderWeb\7za.dll");
+                SevenZip.SevenZipExtractor.SetLibraryPath(@"C:\Users\hiroshi\Documents\GitHub\RemoteStreamReader\RemoteStreamReader\Remote7zReaderWeb\7za.dll");
+
+                var sb = new StringBuilder();
+                using (var rws = new RemoteWebStream(connectionId))
+                using (var bfs = new BufferedStream(rws))
+                using (var sz = new SevenZip.SevenZipExtractor(bfs))
+                //using (var sz = new SevenZip.SevenZipExtractor(rws))
+                {
+                    sb.AppendFormat("file count = {1}{0}", Environment.NewLine, sz.FilesCount);
+                    var files = sz.ArchiveFileNames;
+                    foreach (var v in files.Select((name, idx) => new { Name = name, Idx = idx }))
+                    {
+                        sb.AppendFormat("FILE {1}: {2}{0}", Environment.NewLine, v.Idx, v.Name);
+                    }
+                }
+                sb.AppendLine("DONE");
+                SendMessage(hubManager, connectionId, sb.ToString());
             });
 
             return View();

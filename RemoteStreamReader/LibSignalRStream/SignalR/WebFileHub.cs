@@ -63,7 +63,7 @@ namespace SignalRStream.SignalR
 
         public static void GetFileData(Guid guid, dynamic client, long begin, long end)
         {
-            Trace.WriteLine(string.Format("Send on {0}({1}): get file data command(begin={2}, end{3})", "NA", guid, begin, end));
+            Trace.WriteLine(string.Format("Send on {0}({1}): get file data command(begin={2}, end={3})", "NA", guid, begin, end));
             client.GetFileData(guid.ToString(), begin, end);
         }
 
