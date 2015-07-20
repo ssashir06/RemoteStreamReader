@@ -88,24 +88,30 @@ namespace Remote7zReaderWeb.Controllers
                 Trace.WriteLine(string.Format("File opened"));
                 SendMessage(hubManager, connectionId, "ok, ready to request file data.");
 
-                SevenZip.SevenZipCompressor.SetLibraryPath(@"C:\Users\hiroshi\Documents\GitHub\RemoteStreamReader\RemoteStreamReader\Remote7zReaderWeb\7za.dll");
                 SevenZip.SevenZipExtractor.SetLibraryPath(@"C:\Users\hiroshi\Documents\GitHub\RemoteStreamReader\RemoteStreamReader\Remote7zReaderWeb\7za.dll");
 
-                var sb = new StringBuilder();
-                using (var rws = new RemoteWebStream(connectionId))
-                using (var bfs = new BufferedStream(rws))
-                using (var sz = new SevenZip.SevenZipExtractor(bfs))
-                //using (var sz = new SevenZip.SevenZipExtractor(rws))
+                try
                 {
-                    sb.AppendFormat("file count = {1}{0}", Environment.NewLine, sz.FilesCount);
-                    var files = sz.ArchiveFileNames;
-                    foreach (var v in files.Select((name, idx) => new { Name = name, Idx = idx }))
+                    var sb = new StringBuilder();
+                    using (var rws = new RemoteWebStream(connectionId))
+                    using (var bfs = new BufferedStream(rws, 128))
+                    using (var sz = new SevenZip.SevenZipExtractor(bfs))
                     {
-                        sb.AppendFormat("FILE {1}: {2}{0}", Environment.NewLine, v.Idx, v.Name);
+                        sb.AppendFormat("file count = {1}{0}", Environment.NewLine, sz.FilesCount);
+                        var files = sz.ArchiveFileNames;
+                        foreach (var v in files.Select((name, idx) => new { Name = name, Idx = idx }))
+                        {
+                            sb.AppendFormat("FILE {1}: {2}{0}", Environment.NewLine, v.Idx, v.Name);
+                        }
                     }
+                    sb.AppendLine("DONE");
+                    SendMessage(hubManager, connectionId, sb.ToString());
                 }
-                sb.AppendLine("DONE");
-                SendMessage(hubManager, connectionId, sb.ToString());
+                catch (Exception ex)
+                {
+                    Trace.TraceError(ex.Message);
+                    SendMessage(hubManager, connectionId, string.Format("Error: {1}{0}{2}", Environment.NewLine, ex.Message, ex.StackTrace));
+                }
             });
 
             return View();
