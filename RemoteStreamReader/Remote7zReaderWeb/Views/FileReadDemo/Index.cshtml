@@ -29,6 +29,11 @@
             <input type="button" id="input-open-button" value="Open" />
         </div>
     </form>
+    <div>
+        <div>server message:</div>
+        <div id="received-data">
+        </div>
+    </div>
     <script>
         (function ($, window) {
             var hub = $.connection.WebFileStream;
@@ -52,7 +57,7 @@
             });
 
             hub.client.GetFileSize = function (guid) {
-                hub.invoke('TellFileSize', guid, file.size);
+                hub.invoke('TellLength', guid, file.size);
             };
 
             hub.client.GetFileData = function (guid, begin, end) {
@@ -73,6 +78,12 @@
 
                 hub.invoke('FileClosed');
             }
+
+            hub.client.ReceiveExtraData = function (data) {
+                console.log({ extradata: data });
+
+                $('#received-data').html(data.text);
+            };
 
             $(window).on('unload', function (ev) {
                 hub.invoke('Bye');

@@ -72,6 +72,12 @@ namespace SignalRStream.SignalR
             Trace.WriteLine(string.Format("Send on {0}({1}): close file command", "NA", "NA"));
             client.CloseFile();
         }
+
+        public static void ReceiveExtraData(dynamic client, dynamic data)
+        {
+            Trace.WriteLine(string.Format("Send to {0}({1}): sending extra data", "NA", "NA"));
+            client.ReceiveExtraData(data);
+        }
         
         #endregion
 

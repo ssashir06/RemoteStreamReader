@@ -176,5 +176,16 @@ namespace SignalRStream.SignalR
         }
         
         #endregion
+
+        #region Extra data
+
+        public void SendExtraData(string connectionId, dynamic data)
+        {
+            var context = GlobalHost.ConnectionManager.GetHubContext<WebFileHub>();
+            var client = context.Clients.Client(connectionId);
+            WebFileHub.ReceiveExtraData(client, data);
+        }
+        
+        #endregion
     }
 }
