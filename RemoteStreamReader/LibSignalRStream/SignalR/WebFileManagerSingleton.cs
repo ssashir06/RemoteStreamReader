@@ -142,7 +142,7 @@ namespace SignalRStream.SignalR
         public async Task<long> GetFileSize(string connectionId)
         {
             return await _fileSizeRequests.GetRequestResult(connectionId, (guid, client) =>
-                client.GetFileSize(guid.ToString())
+                WebFileHub.GetFileSize(guid, client)
             );
         }
         
@@ -160,7 +160,7 @@ namespace SignalRStream.SignalR
         public async Task<string> GetFileData(string connectionId, long begin, long end)
         {
             return await _fileBodyRequests.GetRequestResult(connectionId, (guid, client) =>
-                client.GetFileData(guid.ToString(), begin, end)
+                WebFileHub.GetFileData(guid, client, begin, end)
             );
         }
 

@@ -12,7 +12,7 @@ namespace SignalRStream.SignalR
     {
         public WebFileHub() { }
 
-        #region IWebFileHub メンバー
+        #region IWebFileHub メンバー (Input)
 
         public void Hello(string identifier)
         {
@@ -44,6 +44,20 @@ namespace SignalRStream.SignalR
             WebFileHubManagerSingleton.Instance.SetSignalrValueFileData(Context.ConnectionId, guid, response);
         }
 
+        #endregion
+
+        #region Output
+
+        public static void GetFileSize(Guid guid, dynamic client)
+        {
+            client.GetFileSize(guid.ToString());
+        }
+
+        public static void GetFileData(Guid guid, dynamic client, long begin, long end)
+        {
+            client.GetFileData(guid.ToString(), begin, end);
+        }
+        
         #endregion
 
         public override System.Threading.Tasks.Task OnDisconnected(bool stopCalled)
