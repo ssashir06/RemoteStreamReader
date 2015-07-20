@@ -31,6 +31,7 @@ namespace Remote7zReaderWeb.Controllers
                 {
                     Thread.Sleep(1000);
                 }
+                Trace.WriteLine(string.Format("File opened"));
 
                 using (var rws = new RemoteWebStream(connectionId))
                 using (var sr = new StreamReader(rws, Encoding.UTF8))

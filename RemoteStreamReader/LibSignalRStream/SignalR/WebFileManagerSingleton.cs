@@ -136,7 +136,6 @@ namespace SignalRStream.SignalR
 
         public void SetSignalrValueFileSize(string connectionId, string guid, long length)
         {
-            Trace.WriteLine(string.Format("FileSize of {0}({1}): {2}", connectionId, guid, length));
             _fileSizeRequests.SetSignalRValue(connectionId, guid, length);
         }
 
@@ -155,7 +154,6 @@ namespace SignalRStream.SignalR
 
         public void SetSignalrValueFileData(string connectionId, string guid, long begin, long end, string responseBase64)
         {
-            Trace.WriteLine(string.Format("FileData of {0}({1}): length={2}", connectionId, guid, responseBase64.Length));
             _fileBodyRequests.SetSignalRValue(connectionId, guid, new ResponseFileData(begin, end, responseBase64));
         }
         
