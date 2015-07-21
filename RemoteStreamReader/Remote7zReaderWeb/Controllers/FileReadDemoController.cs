@@ -88,8 +88,6 @@ namespace Remote7zReaderWeb.Controllers
                 Trace.WriteLine(string.Format("File opened"));
                 SendMessage(hubManager, connectionId, "ok, ready to request file data.");
 
-                SevenZip.SevenZipExtractor.SetLibraryPath(@"C:\Users\hiroshi\Documents\GitHub\RemoteStreamReader\RemoteStreamReader\Remote7zReaderWeb\7za.dll");
-
                 try
                 {
                     var sb = new StringBuilder();
