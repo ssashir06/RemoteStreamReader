@@ -119,7 +119,10 @@ namespace SignalRStream.SignalR
                     }
                     _helloWaits.Add(identifier, semapher);
                 }
-                await semapher.WaitAsync();
+                if (!await semapher.WaitAsync(TimeSpan.FromSeconds(60)))
+                {
+                    throw new TimeoutException("Waiting for new connection is timed out.");
+                }
                 lock (_helloWaits)
                 {
                     _helloWaits.Remove(identifier);
@@ -132,7 +135,7 @@ namespace SignalRStream.SignalR
 
         #region get Length
 
-        static AsyncRequestAbstract<long> _fileSizeRequests = new AsyncRequestAbstract<long>();
+        static AsyncRequestHandler<long> _fileSizeRequests = new AsyncRequestHandler<long>();
 
         public void SetSignalrValueFileSize(string connectionId, string guid, long length)
         {
@@ -150,7 +153,7 @@ namespace SignalRStream.SignalR
 
         #region FileBody
 
-        static AsyncRequestAbstract<ResponseFileData> _fileBodyRequests = new AsyncRequestAbstract<ResponseFileData>();
+        static AsyncRequestHandler<ResponseFileData> _fileBodyRequests = new AsyncRequestHandler<ResponseFileData>();
 
         public void SetSignalrValueFileData(string connectionId, string guid, long begin, long end, string responseBase64)
         {

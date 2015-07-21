@@ -32,15 +32,21 @@ namespace Remote7zReaderWeb.Controllers
             Task.Factory.StartNew(async () =>
             {
                 var hubManager = WebFileHubManagerSingleton.Instance;
+                var stopwatch =new Stopwatch();
+                stopwatch.Start();
 
                 var connectionId = await hubManager.GetConnectionIdBy(identifier);
                 Trace.WriteLine(string.Format("Connected. ConnectionId={0}", connectionId));
                 SendMessage(hubManager, connectionId, "connected. wainting for opening file");
 
-
                 while (!hubManager.IsOpened(connectionId))
                 {
                     Thread.Sleep(1000);
+                    if (stopwatch.Elapsed > TimeSpan.FromSeconds(600))
+                    {
+                        SendMessage(hubManager, connectionId, "Timedout!");
+                        throw new TimeoutException("Waiting for fileopen is timed out.");
+                    }
                 }
                 Trace.WriteLine(string.Format("File opened"));
                 SendMessage(hubManager, connectionId, "ok, ready to request file data.");
@@ -50,11 +56,15 @@ namespace Remote7zReaderWeb.Controllers
                 using (var rws = new RemoteWebStream(connectionId))
                 using (var sr = new StreamReader(rws, Encoding.UTF8))
                 {
+                    int i = 0;
                     while (sr.Peek() >= 0)
                     {
                         var line = sr.ReadLine();
                         sb.AppendLine(line);
                         Trace.WriteLine(line);
+
+                        i++;
+                        if (i > 10) break;
                     }
 
                     sb.AppendLine();
@@ -76,6 +86,8 @@ namespace Remote7zReaderWeb.Controllers
             Task.Factory.StartNew(async () =>
             {
                 var hubManager = WebFileHubManagerSingleton.Instance;
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
 
                 var connectionId = await hubManager.GetConnectionIdBy(identifier);
                 Trace.WriteLine(string.Format("Connected. ConnectionId={0}", connectionId));
@@ -84,6 +96,11 @@ namespace Remote7zReaderWeb.Controllers
                 while (!hubManager.IsOpened(connectionId))
                 {
                     Thread.Sleep(1000);
+                    if (stopwatch.Elapsed > TimeSpan.FromSeconds(600))
+                    {
+                        SendMessage(hubManager, connectionId, "Timedout!");
+                        throw new TimeoutException("Waiting for fileopen is timed out.");
+                    }
                 }
                 Trace.WriteLine(string.Format("File opened"));
                 SendMessage(hubManager, connectionId, "ok, ready to request file data.");

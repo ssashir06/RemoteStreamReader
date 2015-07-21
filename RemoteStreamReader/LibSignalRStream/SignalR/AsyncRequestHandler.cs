@@ -9,7 +9,7 @@ using Microsoft.AspNet.SignalR.Hubs;
 
 namespace SignalRStream.SignalR
 {
-    class AsyncRequestAbstract<TResponse>
+    class AsyncRequestHandler<TResponse>
     {
         #region class
 
@@ -37,7 +37,7 @@ namespace SignalRStream.SignalR
         readonly int? _maxRequestPerConnection;
         readonly IDictionary<string, IList<ValueContainerSemaphore<TResponse>>> _responses = new Dictionary<string, IList<ValueContainerSemaphore<TResponse>>>();
 
-        public AsyncRequestAbstract(int? numberOfMaxRequestsPerConnection = null)
+        public AsyncRequestHandler(int? numberOfMaxRequestsPerConnection = null)
         {
             _maxRequestPerConnection = numberOfMaxRequestsPerConnection;
         }
@@ -76,9 +76,11 @@ namespace SignalRStream.SignalR
                 }
                 signalrCaller(container.Guid, context.Clients.Client(connectionId));
 
-                await container.WaitAsync();
+                if (!await container.WaitAsync(TimeSpan.FromSeconds(60)))
+                {
+                    throw new TimeoutException("Async Timeout");
+                }
                 response = container.Value;
-                // TODO: タイムアウトの取り扱い
 
                 lock (containers)
                 {

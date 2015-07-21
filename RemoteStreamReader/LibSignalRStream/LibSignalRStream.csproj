@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SignalR\AsyncRequestAbstract.cs" />
+    <Compile Include="SignalR\AsyncRequestHandler.cs" />
     <Compile Include="SignalR\ClientState.cs" />
     <Compile Include="SignalR\IWebFileHub.cs" />
     <Compile Include="SignalR\ResponseFileData.cs" />
