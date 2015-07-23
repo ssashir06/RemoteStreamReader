@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remote7zReaderWeb", "Remote7zReaderWeb\Remote7zReaderWeb.csproj", "{F6D906C7-2874-49F3-9B56-5DCB4018984E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibSignalRStream", "LibSignalRStream\LibSignalRStream.csproj", "{834600F7-1FD6-4F23-8612-027A41EDE7FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Remote7zReaderWeb.Test", "Remote7zReaderWeb.Test\Remote7zReaderWeb.Test.csproj", "{F82CFA52-214B-448D-A335-8A9ECA8B66E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{834600F7-1FD6-4F23-8612-027A41EDE7FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{834600F7-1FD6-4F23-8612-027A41EDE7FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{834600F7-1FD6-4F23-8612-027A41EDE7FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F82CFA52-214B-448D-A335-8A9ECA8B66E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F82CFA52-214B-448D-A335-8A9ECA8B66E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F82CFA52-214B-448D-A335-8A9ECA8B66E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F82CFA52-214B-448D-A335-8A9ECA8B66E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
